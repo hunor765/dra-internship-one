@@ -12,9 +12,43 @@
 
   window.dataLayer = window.dataLayer || [];
   var CURRENCY = window.STORE_CURRENCY || 'USD';
+  var GTM_ID  = window.GTM_CONTAINER_ID;
 
   var CART_KEY = 'sns_cart';
   var WISH_KEY = 'sns_wishlist';
+
+  /* ----------------------------------------------------------------------
+   * GTM readiness gate
+   *
+   * Every ecommerce event is held until the GTM container has actually
+   * loaded (i.e. window.google_tag_manager[GTM_ID] exists). Interaction
+   * events fire immediately once GTM is up; the page-load view_* events
+   * queued in the <head> are flushed the moment it becomes ready.
+   *
+   * A ~10s fallback fires anything still queued even if GTM never loads
+   * (e.g. blocked by an ad blocker) so the training site keeps working.
+   * -------------------------------------------------------------------- */
+  var _gtmReady   = false;
+  var _readyQueue = [];
+
+  function gtmIsLoaded() {
+    return !!(window.google_tag_manager && GTM_ID && window.google_tag_manager[GTM_ID]);
+  }
+  function markGtmReady() {
+    if (_gtmReady) return;
+    _gtmReady = true;
+    _readyQueue.splice(0).forEach(function (fn) { try { fn(); } catch (e) {} });
+  }
+  function runWhenGtmReady(fn) {
+    if (_gtmReady) { fn(); return; }
+    _readyQueue.push(fn);
+  }
+  // Poll for the container. Starts as soon as main.js executes.
+  (function pollGtm(attempt) {
+    if (gtmIsLoaded()) { markGtmReady(); return; }
+    if (attempt >= 100) { markGtmReady(); return; } // ~10s safety fallback
+    setTimeout(function () { pollGtm(attempt + 1); }, 100);
+  })(0);
 
   /* ----------------------------------------------------------------------
    * Storage helpers
@@ -44,10 +78,12 @@
    * which is the documented GA4 best practice to avoid stale merged data.
    * -------------------------------------------------------------------- */
   function pushEcommerce(eventName, ecommerce) {
-    window.dataLayer.push({ ecommerce: null });
-    window.dataLayer.push({
-      event: eventName,
-      ecommerce: ecommerce
+    runWhenGtmReady(function () {
+      window.dataLayer.push({ ecommerce: null });
+      window.dataLayer.push({
+        event: eventName,
+        ecommerce: ecommerce
+      });
     });
   }
 
@@ -152,11 +188,16 @@
   function toggleWishlist(item) {
     var wl = getWishlist();
     var key = lineKey(item);
-    var exists = wl.some(function (i) { return lineKey(i) === key; });
+    var stored = wl.find(function (i) { return lineKey(i) === key; });
 
-    if (exists) {
+    if (stored) {
       wl = wl.filter(function (i) { return lineKey(i) !== key; });
       saveWishlist(wl);
+      pushEcommerce('remove_from_wishlist', {
+        currency: CURRENCY,
+        value: round2(stored.price * stored.quantity),
+        items: [stored]
+      });
       return false; // removed
     }
     wl.push(item);
@@ -168,6 +209,22 @@
       items: [item]
     });
     return true; // added
+  }
+
+  /* Remove a specific stored item from the wishlist, firing the event. */
+  function removeFromWishlist(item) {
+    var wl = getWishlist();
+    var key = lineKey(item);
+    var stored = wl.find(function (i) { return lineKey(i) === key; });
+    if (!stored) return;
+
+    wl = wl.filter(function (i) { return lineKey(i) !== key; });
+    saveWishlist(wl);
+    pushEcommerce('remove_from_wishlist', {
+      currency: CURRENCY,
+      value: round2(stored.price * stored.quantity),
+      items: [stored]
+    });
   }
 
   /* ======================================================================
@@ -190,6 +247,17 @@
    * ==================================================================== */
   document.addEventListener('DOMContentLoaded', function () {
     refreshBadges();
+
+    /* --- Flush page-load view_* events queued in the <head> --------- */
+    // These wait for GTM exactly like interaction events. Order preserved.
+    var pending = window.SNS_PENDING_EVENTS || [];
+    pending.forEach(function (evt) {
+      runWhenGtmReady(function () {
+        window.dataLayer.push({ ecommerce: null });
+        window.dataLayer.push(evt);
+      });
+    });
+    window.SNS_PENDING_EVENTS = [];
 
     /* --- Add to cart buttons ---------------------------------------- */
     document.querySelectorAll('[data-add-to-cart]').forEach(function (btn) {
@@ -215,19 +283,30 @@
 
     /* --- Add / remove wishlist buttons ------------------------------ */
     document.querySelectorAll('[data-toggle-wishlist]').forEach(function (btn) {
-      // Reflect current state on load.
-      var item = itemFromEl(btn);
-      if (item && getWishlist().some(function (i) { return lineKey(i) === lineKey(item); })) {
-        btn.classList.add('is-active');
-      }
-      btn.addEventListener('click', function () {
+      var scope = btn.closest('[data-product-scope]');
+      var variantSel = scope && scope.querySelector('[data-variant-select]');
+
+      // Build the item for the *currently selected* variant.
+      function currentItem() {
         var it = itemFromEl(btn);
-        if (!it) return;
-        var scope = btn.closest('[data-product-scope]');
-        var variantSel = scope && scope.querySelector('[data-variant-select]');
-        if (variantSel && variantSel.value) {
+        if (it && variantSel && variantSel.value) {
           it.item_variant = variantSel.options[variantSel.selectedIndex].text;
         }
+        return it;
+      }
+      // Reflect saved state for this exact variant.
+      function reflect() {
+        var it = currentItem();
+        var active = it && getWishlist().some(function (i) { return lineKey(i) === lineKey(it); });
+        btn.classList.toggle('is-active', !!active);
+      }
+
+      reflect();
+      if (variantSel) variantSel.addEventListener('change', reflect);
+
+      btn.addEventListener('click', function () {
+        var it = currentItem();
+        if (!it) return;
         var added = toggleWishlist(it);
         btn.classList.toggle('is-active', added);
         flash(btn, added ? 'Saved ♥' : 'Removed');
@@ -287,6 +366,7 @@
     removeFromCart: removeFromCart,
     changeQty: changeQty,
     toggleWishlist: toggleWishlist,
+    removeFromWishlist: removeFromWishlist,
     lineKey: lineKey,
     cartValue: cartValue,
     round2: round2,

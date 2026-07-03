@@ -19,12 +19,20 @@ $cat        = get_category($product['category']);
 
 $item = ga_item($product);
 
+// For view_item, include the default (first) variant so item_variant is
+// present whenever the product actually has variants. The button payload
+// below stays variant-free — main.js fills in the variant the user selects.
+$viewItem = $item;
+if (!empty($product['variants'])) {
+    $viewItem['item_variant'] = $product['variants'][0]['name'];
+}
+
 $PAGE_DATALAYER = [[
     'event'     => 'view_item',
     'ecommerce' => [
         'currency' => $STORE['currency'],
         'value'    => round((float) $product['price'], 2),
-        'items'    => [$item],
+        'items'    => [$viewItem],
     ],
 ]];
 

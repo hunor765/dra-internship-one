@@ -79,9 +79,8 @@ require __DIR__ . '/includes/header.php';
 
     root.querySelectorAll('[data-drop]').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        var wl = SNS.getWishlist();
-        wl.splice(+btn.getAttribute('data-drop'), 1);
-        SNS.saveWishlist(wl);
+        var item = SNS.getWishlist()[+btn.getAttribute('data-drop')];
+        if (item) SNS.removeFromWishlist(item); // fires remove_from_wishlist
         render();
       });
     });

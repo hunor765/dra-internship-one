@@ -24,18 +24,20 @@ $GTM_ID = 'GTM-PQ8X4LR';
 
 <!-- ============================================================
      dataLayer bootstrap — MUST come before the GTM snippet.
-     We initialise the array and push any page-load ecommerce
-     events that the PHP page handed us in $PAGE_DATALAYER.
+     Page-load ecommerce events are NOT pushed directly here. They
+     are queued in SNS_PENDING_EVENTS and flushed by main.js ONLY
+     after the GTM container has finished loading, so no ecommerce
+     event fires before GTM is ready to receive it.
      ============================================================ -->
 <script>
   window.dataLayer = window.dataLayer || [];
+  window.GTM_CONTAINER_ID = '<?= $GTM_ID ?>';
+  window.SNS_PENDING_EVENTS = window.SNS_PENDING_EVENTS || [];
 </script>
 <?php if (!empty($PAGE_DATALAYER)): ?>
 <script>
   <?php foreach ($PAGE_DATALAYER as $event): ?>
-  // Clear the previous ecommerce object first (GA4 best practice) then push.
-  window.dataLayer.push({ ecommerce: null });
-  window.dataLayer.push(<?= json_encode($event, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>);
+  window.SNS_PENDING_EVENTS.push(<?= json_encode($event, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>);
   <?php endforeach; ?>
 </script>
 <?php endif; ?>

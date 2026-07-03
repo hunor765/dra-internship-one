@@ -22,6 +22,7 @@ Every standard GA4 ecommerce event is wired into `window.dataLayer`:
 | `remove_from_cart` | Removing a line / reducing qty |
 | `view_cart`        | Cart page (on load) |
 | `add_to_wishlist`  | "Save to wishlist" buttons |
+| `remove_from_wishlist` | Un-saving an item (heart toggle or wishlist ✕) |
 | `begin_checkout`   | "Checkout" button on the cart |
 | `add_shipping_info`| "Continue to payment" (carries `shipping_tier`) |
 | `add_payment_info` | "Place order" (carries `payment_type`) |
@@ -31,6 +32,18 @@ Each push follows GA4 best practice: it first clears the previous ecommerce
 object with `dataLayer.push({ ecommerce: null })`, then pushes the event with a
 properly-shaped `items` array (`item_id`, `item_name`, `item_brand`,
 `item_category`, `price`, `quantity`, `item_variant`, `index`, list info…).
+
+**Events wait for GTM.** No ecommerce event fires until the GTM container has
+actually loaded. Page-load `view_*` events are queued in the `<head>`
+(`SNS_PENDING_EVENTS`) and interaction events go through a readiness gate in
+`main.js`; everything is flushed — in order — only once
+`window.google_tag_manager['GTM-PQ8X4LR']` exists. A ~10s fallback still fires
+queued events if GTM is blocked, so the site never silently loses data.
+
+**`item_variant`** is attached wherever a product has variants — the selected
+option on add-to-cart / add-to-wishlist, the default option on `view_item`, and
+it then rides through the cart into `begin_checkout`, `add_shipping_info`,
+`add_payment_info` and `purchase`.
 
 ## Pages & flow
 
