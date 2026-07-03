@@ -1,0 +1,88 @@
+<?php
+/**
+ * Shared page header. Every page includes this, so the GTM snippet and the
+ * dataLayer bootstrap live in exactly one place.
+ *
+ * Pages may set $PAGE_TITLE and $PAGE_DATALAYER (an array of dataLayer events
+ * to push on load, e.g. view_item_list / view_item) before including this.
+ */
+
+require_once __DIR__ . '/functions.php';
+
+$PAGE_TITLE      = $PAGE_TITLE      ?? 'Sprout & Spade';
+$PAGE_DATALAYER  = $PAGE_DATALAYER  ?? [];
+
+// GTM container for the Sprout & Spade training store.
+$GTM_ID = 'GTM-PQ8X4LR';
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><?= htmlspecialchars($PAGE_TITLE) ?> · Sprout &amp; Spade</title>
+
+<!-- ============================================================
+     dataLayer bootstrap — MUST come before the GTM snippet.
+     We initialise the array and push any page-load ecommerce
+     events that the PHP page handed us in $PAGE_DATALAYER.
+     ============================================================ -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+</script>
+<?php if (!empty($PAGE_DATALAYER)): ?>
+<script>
+  <?php foreach ($PAGE_DATALAYER as $event): ?>
+  // Clear the previous ecommerce object first (GA4 best practice) then push.
+  window.dataLayer.push({ ecommerce: null });
+  window.dataLayer.push(<?= json_encode($event, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>);
+  <?php endforeach; ?>
+</script>
+<?php endif; ?>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','<?= $GTM_ID ?>');</script>
+<!-- End Google Tag Manager -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="/assets/css/style.css">
+<script>
+  // Expose the store currency to the client-side cart logic.
+  window.STORE_CURRENCY = <?= json_encode($STORE['currency']) ?>;
+</script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=<?= $GTM_ID ?>"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="brand" href="/index.php">
+      <span class="brand__mark">🌿</span>
+      <span class="brand__name">Sprout&nbsp;&amp;&nbsp;Spade</span>
+    </a>
+
+    <nav class="main-nav" aria-label="Categories">
+      <?php global $CATEGORIES; foreach ($CATEGORIES as $cat): ?>
+        <a href="/category.php?id=<?= urlencode($cat['id']) ?>"><?= htmlspecialchars($cat['name']) ?></a>
+      <?php endforeach; ?>
+    </nav>
+
+    <div class="header-actions">
+      <a class="header-actions__link" href="/wishlist.php" aria-label="Wishlist">
+        ♥ <span class="badge" data-wishlist-count>0</span>
+      </a>
+      <a class="header-actions__link" href="/cart.php" aria-label="Cart">
+        🛒 <span class="badge" data-cart-count>0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap page">
