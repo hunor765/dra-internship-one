@@ -103,6 +103,22 @@ class CookieBannerModal {
     localStorage.setItem('cookie_consent_modal', JSON.stringify(this.cookies));
     document.getElementById('cookie-modal-banner').remove();
     this.setServerCookies();
+    this.pushConsentEvent();
+  }
+
+  pushConsentEvent() {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'cookie_consent_update',
+      cookie_consent: {
+        essential: this.cookies.essential,
+        analytics: this.cookies.analytics,
+        marketing: this.cookies.marketing,
+        functional: this.cookies.functional
+      },
+      consent_timestamp: new Date().toISOString(),
+      consent_method: 'explicit'
+    });
   }
 
   setServerCookies() {
