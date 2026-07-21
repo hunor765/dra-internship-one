@@ -12,6 +12,7 @@
 $STORE = [
     'name'     => 'Sprout & Spade',
     'currency' => 'USD',
+    'icon'     => '🌿',
 ];
 
 /* ---------------------------------------------------------------------------
@@ -70,6 +71,17 @@ $PRODUCTS = [
             ['id' => 'cherry',    'name' => 'Cherry'],
             ['id' => 'roma',      'name' => 'Roma'],
         ],
+        'options' => [
+            ['id' => 'seed-count', 'label' => 'Seed count', 'choices' => [
+                ['id' => '25',  'name' => '25 seeds',  'price' => 0],
+                ['id' => '50',  'name' => '50 seeds',  'price' => 2.50],
+                ['id' => '100', 'name' => '100 seeds', 'price' => 4.50],
+            ]],
+            ['id' => 'starter', 'label' => 'Starter kit', 'choices' => [
+                ['id' => 'none', 'name' => 'Seeds only',           'price' => 0],
+                ['id' => 'pots', 'name' => '+ biodegradable pots',  'price' => 5.00],
+            ]],
+        ],
     ],
     'SKU-SUN-002' => [
         'id'       => 'SKU-SUN-002',
@@ -106,6 +118,17 @@ $PRODUCTS = [
         'rating'   => 4.7,
         'desc'     => 'A forged stainless steel trowel with an ergonomic ash-wood handle. Depth markings etched into the blade for precise planting.',
         'variants' => [],
+        'options' => [
+            ['id' => 'engraving', 'label' => 'Handle engraving', 'choices' => [
+                ['id' => 'none',     'name' => 'No engraving',   'price' => 0],
+                ['id' => 'initials', 'name' => 'Initials',       'price' => 5.00],
+                ['id' => 'message',  'name' => 'Short message',  'price' => 8.00],
+            ]],
+            ['id' => 'sheath', 'label' => 'Leather sheath', 'choices' => [
+                ['id' => 'none', 'name' => 'No sheath',        'price' => 0],
+                ['id' => 'add',  'name' => '+ Leather sheath',  'price' => 7.00],
+            ]],
+        ],
     ],
     'SKU-PRU-005' => [
         'id'       => 'SKU-PRU-005',
@@ -118,6 +141,16 @@ $PRODUCTS = [
         'variants' => [
             ['id' => 'standard', 'name' => 'Standard Grip'],
             ['id' => 'compact',  'name' => 'Compact Grip'],
+        ],
+        'options' => [
+            ['id' => 'blade', 'label' => 'Blade coating', 'choices' => [
+                ['id' => 'standard', 'name' => 'Standard steel',   'price' => 0],
+                ['id' => 'titanium', 'name' => 'Titanium-coated',  'price' => 6.00],
+            ]],
+            ['id' => 'giftbox', 'label' => 'Gift box', 'choices' => [
+                ['id' => 'none', 'name' => 'No gift box',   'price' => 0],
+                ['id' => 'add',  'name' => '+ Gift box',     'price' => 4.00],
+            ]],
         ],
     ],
     'SKU-RAK-006' => [
@@ -145,6 +178,16 @@ $PRODUCTS = [
             ['id' => 'medium', 'name' => 'Medium (2-pack)'],
             ['id' => 'large',  'name' => 'Large (single)'],
         ],
+        'options' => [
+            ['id' => 'saucers', 'label' => 'Saucers', 'choices' => [
+                ['id' => 'included', 'name' => 'Matching saucers',   'price' => 0],
+                ['id' => 'premium',  'name' => 'Premium glazed saucers', 'price' => 5.00],
+            ]],
+            ['id' => 'wrap', 'label' => 'Gift wrap', 'choices' => [
+                ['id' => 'none',  'name' => 'No wrap',         'price' => 0],
+                ['id' => 'kraft', 'name' => 'Kraft + twine',    'price' => 3.00],
+            ]],
+        ],
     ],
     'SKU-SLF-008' => [
         'id'       => 'SKU-SLF-008',
@@ -157,6 +200,16 @@ $PRODUCTS = [
         'variants' => [
             ['id' => 'white',    'name' => 'Matte White'],
             ['id' => 'charcoal', 'name' => 'Charcoal'],
+        ],
+        'options' => [
+            ['id' => 'reservoir', 'label' => 'Reservoir size', 'choices' => [
+                ['id' => 'standard', 'name' => 'Standard (2 weeks)', 'price' => 0],
+                ['id' => 'xl',       'name' => 'XL (4 weeks)',       'price' => 9.00],
+            ]],
+            ['id' => 'stand', 'label' => 'Plant stand', 'choices' => [
+                ['id' => 'none',   'name' => 'No stand',        'price' => 0],
+                ['id' => 'bamboo', 'name' => '+ Bamboo stand',   'price' => 14.00],
+            ]],
         ],
     ],
     'SKU-HNG-009' => [
@@ -207,6 +260,18 @@ $PRODUCTS = [
 ];
 
 /* ---------------------------------------------------------------------------
+ * Coupon / promo codes (advanced ecommerce).
+ *
+ * Applied on the cart; the code + discount ride through begin_checkout,
+ * add_shipping_info, add_payment_info and purchase as the GA4 `coupon` param,
+ * and the discount reduces the order value.
+ * ------------------------------------------------------------------------ */
+$COUPONS = [
+    'SPROUT10' => ['code' => 'SPROUT10', 'type' => 'percent', 'amount' => 10,   'label' => '10% off your order'],
+    'WELCOME5' => ['code' => 'WELCOME5', 'type' => 'fixed',   'amount' => 5.00, 'label' => '$5 off your order'],
+];
+
+/* ---------------------------------------------------------------------------
  * Promotions (used for view_promotion / select_promotion events)
  * ------------------------------------------------------------------------ */
 $PROMOTIONS = [
@@ -215,6 +280,30 @@ $PROMOTIONS = [
         'promotion_name' => 'Spring Planting Sale',
         'creative_name'  => 'hero_banner',
         'creative_slot'  => 'homepage_hero',
+    ],
+];
+
+/* ---------------------------------------------------------------------------
+ * Product personalization quiz (quiz.php)
+ *
+ * Four questions; on completion the client picks a random handful of products
+ * from the catalog as "recommendations" and fires quiz_complete +
+ * view_item_list. The answers themselves don't filter — the match is random —
+ * so every run returns a fresh set.
+ * ------------------------------------------------------------------------ */
+$QUIZ = [
+    'id'               => 'garden_match',
+    'nav_label'        => 'Garden quiz',
+    'title'            => 'Find your garden match',
+    'intro'            => 'Answer four quick questions and we\'ll pull a few things from the shop that could be a good fit.',
+    'result_list_id'   => 'quiz_recommendations',
+    'result_list_name' => 'Quiz Recommendations',
+    'result_count'     => 3,
+    'questions'        => [
+        ['id' => 'space',      'q' => 'Where are you growing?',           'a' => ['A balcony or windowsill', 'A small backyard', 'A big open garden', 'Mostly indoors']],
+        ['id' => 'time',       'q' => 'How much time can you give it?',   'a' => ['Five minutes here and there', 'A weekend ritual', 'As long as it takes', 'Honestly, very little']],
+        ['id' => 'experience', 'q' => 'How would you rate your thumb?',    'a' => ['Brand new to this', 'Killed a few, learned a lot', 'Reliably green', 'I give the advice']],
+        ['id' => 'goal',       'q' => 'What are you most after?',          'a' => ['Something to eat', 'Colour and flowers', 'Low-effort greenery', 'The right tools']],
     ],
 ];
 

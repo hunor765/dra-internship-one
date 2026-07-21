@@ -59,7 +59,7 @@ function ga_item(array $product, int $index = 0, ?string $listId = null, ?string
         'quantity'       => 1,
     ];
     if ($index > 0) {
-        $item['index'] = $index - 1;
+        $item['index'] = $index;
     }
     if ($listId !== null) {
         $item['item_list_id'] = $listId;
