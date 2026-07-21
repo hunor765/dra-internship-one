@@ -522,3 +522,139 @@ $LOCATIONS = [
         ],
     ],
 ];
+
+/* ---------------------------------------------------------------------------
+ * DOWNLOADABLE DOCUMENTS
+ *
+ * Each entry is rendered to a real PDF on demand by download.php (see
+ * includes/pdf.php) — nothing binary is committed. A document either belongs
+ * to a product ('product' => SKU) and shows on that product page, or is
+ * site-wide ('product' => null) and shows only in the resource centre.
+ *
+ * 'type' and 'label' ride along on the file_download event so downloads can be
+ * segmented in GA4 by what kind of document was taken.
+ * ------------------------------------------------------------------------- */
+$DOCUMENTS = [
+    'growing-guide-tomato' => [
+        'id'      => 'growing-guide-tomato',
+        'title'   => 'Heirloom Tomato Seeds — Growing Guide',
+        'label'   => 'Growing guide',
+        'type'    => 'growing_guide',
+        'product' => 'SKU-TOM-001',
+        'file'    => 'heirloom-tomato-seeds-growing-guide.pdf',
+        'summary' => 'Sowing depth, spacing, hardening off, and a week-by-week schedule from tray to first truss.',
+        'sections' => [
+            ['heading' => 'Sowing', 'body' => [
+                'Sow indoors 6 to 8 weeks before your last expected frost. Fill a seed tray with a fine, free-draining compost, firm it lightly, and set seeds 5mm deep with roughly 3cm between them.',
+                'Germination takes 7 to 14 days at 18-24C. A propagator lid or a clear bag over the tray keeps humidity steady; remove it the moment the first seedlings show, or you will invite damping off.',
+            ]],
+            ['heading' => 'Potting on and hardening off', 'body' => [
+                'Move seedlings into 9cm pots once the first true leaves appear — the pair after the seed leaves. Bury the stem deeper than it sat before; tomatoes root along buried stem, which buys you a sturdier plant.',
+                'Harden off over 10 to 14 days before planting out. Stand plants outside in a sheltered spot for an hour on day one and build up from there.',
+                '- Do not plant out until night temperatures hold above 10C.',
+                '- Wind does more damage than cold at this stage. Shelter matters more than sun.',
+            ]],
+            ['heading' => 'Feeding and watering', 'body' => [
+                'Water consistently rather than heavily. Irregular watering is the single most common cause of blossom end rot and split fruit.',
+                'Start a high-potassium feed once the first truss has set, and repeat every 10 to 14 days through the season.',
+            ]],
+            ['heading' => 'Troubleshooting', 'body' => [
+                '- Leaf curl with no other symptoms is usually heat stress and needs no action.',
+                '- Yellowing lower leaves late in the season are normal; remove them to improve airflow.',
+                '- Fruit that stays green long past its time usually means too much nitrogen and not enough potassium.',
+            ]],
+        ],
+    ],
+
+    'care-card-trowel' => [
+        'id'      => 'care-card-trowel',
+        'title'   => 'Stainless Steel Hand Trowel — Care & Maintenance',
+        'label'   => 'Care & maintenance',
+        'type'    => 'care_guide',
+        'product' => 'SKU-TRO-004',
+        'file'    => 'stainless-hand-trowel-care.pdf',
+        'summary' => 'Cleaning, drying, seasonal oiling and how to re-seat a loosened ash handle.',
+        'sections' => [
+            ['heading' => 'After every use', 'body' => [
+                'Rinse soil off the blade and dry it before storing. Stainless steel resists rust; it does not ignore it. Damp soil left sitting in the neck of the blade will pit the finish over a season.',
+            ]],
+            ['heading' => 'Seasonal maintenance', 'body' => [
+                'Once a year, wipe the blade with a light machine oil or boiled linseed oil on a rag. The same rag will do the ash handle — the wood is finished but not sealed, and an annual coat keeps it from drying out and shrinking away from the tang.',
+                '- Do not put the tool in a dishwasher. The detergent will grey the ash and dull the blade.',
+                '- Store hanging rather than blade-down in a bucket.',
+            ]],
+            ['heading' => 'Re-seating a loose handle', 'body' => [
+                'If the handle works loose, the wood has shrunk rather than the tang bending. Drive the handle back on with a mallet against a block of scrap, then stand the tool blade-up somewhere humid for a week before oiling.',
+            ]],
+        ],
+    ],
+
+    'spec-self-watering-planter' => [
+        'id'      => 'spec-self-watering-planter',
+        'title'   => 'Self-Watering Planter — Technical Specification',
+        'label'   => 'Technical specification',
+        'type'    => 'technical_spec',
+        'product' => 'SKU-SLF-008',
+        'file'    => 'self-watering-planter-spec.pdf',
+        'summary' => 'Dimensions, reservoir capacity, materials, drainage behaviour and winter tolerances.',
+        'sections' => [
+            ['heading' => 'Dimensions and capacity', 'body' => [
+                '- Outer diameter: 320mm. Overall height: 295mm.',
+                '- Growing volume: 11.5 litres of compost.',
+                '- Reservoir capacity: 2.4 litres, roughly 8 to 12 days in summer for a mature plant.',
+                '- Weight empty: 1.9kg. Typical planted weight: 14kg.',
+            ]],
+            ['heading' => 'Materials', 'body' => [
+                'The outer shell is UV-stabilised recycled polypropylene, rated for continuous outdoor exposure. The inner basket and wick are the same material; there is no metal in the assembly, so nothing in it can rust or stain a patio.',
+            ]],
+            ['heading' => 'Drainage and overflow', 'body' => [
+                'An overflow port sits 15mm below the reservoir lid. In sustained rain the reservoir self-levels through this port rather than waterlogging the root zone — you do not need to move the planter under cover.',
+                'The fill tube reads level through a float indicator. Refill when the indicator sits below the minimum mark; do not top up above the maximum, as the wick needs an air gap to work.',
+            ]],
+            ['heading' => 'Cold weather', 'body' => [
+                'The shell is rated to -20C, but a full reservoir that freezes solid will crack any planter. Drain the reservoir before the first hard frost and leave the overflow port open through the winter.',
+            ]],
+        ],
+    ],
+
+    'planting-calendar' => [
+        'id'      => 'planting-calendar',
+        'title'   => 'Seasonal Planting Calendar',
+        'label'   => 'Seasonal planting calendar',
+        'type'    => 'planting_calendar',
+        'product' => null,
+        'file'    => 'sprout-and-spade-planting-calendar.pdf',
+        'summary' => 'What to sow, plant out and harvest month by month, for a temperate northern garden.',
+        'sections' => [
+            ['heading' => 'Late winter — February', 'body' => [
+                'Sow under cover: tomatoes, chillies, aubergines, onions from seed. Chit early potatoes somewhere light and frost free.',
+                'Outdoors there is little to do beyond cutting back and preparing beds. Resist the urge to sow into cold, wet soil; nothing gained in February survives contact with March.',
+            ]],
+            ['heading' => 'Spring — March to May', 'body' => [
+                'Sow under cover: courgettes, squash, cucumbers, French and runner beans from mid-April.',
+                'Sow direct: carrots, beetroot, radish, parsnips, salad leaves in succession every three weeks.',
+                'Plant out: hardened-off brassicas, onion sets, early potatoes. Watch the forecast — a late frost in May undoes a lot of March.',
+            ]],
+            ['heading' => 'Summer — June to August', 'body' => [
+                'Sow direct: more salad, chard, spring onions, and a final sowing of French beans in early July.',
+                'Harvest continuously. Beans and courgettes in particular will stop producing if you let anything go to seed on the plant.',
+            ]],
+            ['heading' => 'Autumn and early winter — September to January', 'body' => [
+                'Sow: overwintering broad beans and garlic in October and November. Sow green manure on any bed you are not using.',
+                'Plant: bare-root fruit and spring bulbs. Tulips go in last, in November, once the soil has cooled.',
+                'Lift and store maincrop potatoes and squash before the first hard frost.',
+            ]],
+        ],
+    ],
+
+    'catalogue-current' => [
+        'id'      => 'catalogue-current',
+        'title'   => 'Sprout & Spade — Product Catalogue',
+        'label'   => 'Product catalogue',
+        'type'    => 'catalogue',
+        'product' => null,
+        'file'    => 'sprout-and-spade-catalogue.pdf',
+        'summary' => 'The full range with prices, in a printable list.',
+        'sections' => [],   // built from the live catalogue by download.php
+    ],
+];
