@@ -136,7 +136,10 @@ require __DIR__ . '/includes/header.php';
       if (t.couponCode) payload.coupon = t.couponCode;
       SNS.pushEcommerce('add_shipping_info', payload);
 
-      window.location.href = '/checkout-payment.php';
+      // Route through the SPA. The old hard redirect started unloading the
+      // page while add_shipping_info was still queued behind the GTM
+      // readiness gate, which is exactly how that event goes missing.
+      SNS.go('/checkout-payment.php');
     });
   });
 })();
